@@ -85,7 +85,7 @@ Learner: <code>john@example.com</code> / <code>Pass1234!</code>
 <section id="details" class="page">
 <h2 id="learnerTitle">Learner Details</h2>
 <div class="grid">
-<div><label>Learner Name</label><input data-field="name"></div><div><label>Instructor</label><input data-field="instructor"></div>
+<div><label>Learner Name</label><input data-field="name"></div><div><label>Allocated Instructor</label><select id="instructorAssign" onchange="assignLearnerInstructor(this.value)"></select><input id="ameliaEmployeeId" placeholder="Amelia instructor/employee ID" onchange="updateAllocatedInstructorAmeliaId(this.value)"></div>
 <div><label>Start Date</label><input data-field="start"></div><div><label>Target Test Date</label><input data-field="target"></div>
 <div><label>Test Centre</label><select data-field="testCentre"><option value="">Select test centre</option><option>Bailieston</option><option>Paisley</option><option>Bishopbriggs</option><option>Airdrie</option><option>Hamilton</option><option>East Kilbride</option><option>Other</option></select></div><div><label>Vehicle</label><select data-field="vehicle"><option value="">Select vehicle</option><option>Auto</option><option>Manual</option></select></div>
 <div><label>Phone</label><input data-field="phone"></div><div><label>Email / Login</label><input data-field="email"></div>
@@ -164,8 +164,8 @@ function seed(){
     currentId:'L1',
     activeUserId:'',
     instructors:{
-      I1:{id:'I1',name:'Dave Allison',email:'dave@allisondriveracademy.co.uk',password:'Instructor123!',role:'instructor'},
-      I2:{id:'I2',name:'Admin Instructor',email:'admin@allisondriveracademy.co.uk',password:'Admin123!',role:'instructor'}
+      I1:{id:'I1',name:'Dave Allison',email:'dave@allisondriveracademy.co.uk',password:'Instructor123!',role:'instructor',ameliaEmployeeId:''},
+      I2:{id:'I2',name:'Admin',email:'admin@allisondriveracademy.co.uk',password:'Admin123!',role:'admin',ameliaEmployeeId:''}
     },
     learners:{
       L1:{id:'L1',userId:'U_L1',instructorUserId:'I1',name:'John Smith',instructor:'Dave Allison',start:'14 Jan 2026',target:'21 Jul 2026',testCentre:'Wakefield',vehicle:'Manual',phone:'07700 900123',email:'john@example.com',password:'Pass1234!',status:'Open',skills:skills.map((s,i)=>({stage:i<4?'reflection':i<19?'independent':i<24?'prompted':'introduced',notes:i==18?'Improve lane discipline and mirror checks on exit.':''})),lessons:[{date:'2 July 2026',duration:'2 hours',objectives:'Roundabouts and planning',notes:'Improved after second route. Needs mirror timing.',homework:'Commentary driving on approach to roundabouts.',reflection:'I felt more confident but need to plan earlier.'}],practices:[{date:'4 July 2026',hours:'1.5',supervisor:'Parent',roads:'Urban / dual carriageway',notes:'Practised following signs and lane changes.'}],mocks:[{date:'6 July 2026',route:'Wakefield test route 3',weather:'Dry',examiner:'Dave Allison',marks:{},debrief:'Pass standard. Mirrors and planning are next focus.',reflection:'Nervous at first, then settled.'}],finalNotes:''},
@@ -175,15 +175,19 @@ function seed(){
 }
 function migrateState(){
   if(!state.instructors)state.instructors=seed().instructors;
+  Object.entries(seed().instructors).forEach(([id,instructor])=>{if(!state.instructors[id])state.instructors[id]=instructor});
+  Object.values(state.instructors).forEach(i=>{if(!i.ameliaEmployeeId)i.ameliaEmployeeId=''});
   if(!Array.isArray(state.bookingRequests))state.bookingRequests=[];
   Object.values(state.learners||{}).forEach((l,i)=>{if(!l.userId)l.userId='U_'+l.id;if(!l.instructorUserId)l.instructorUserId='I1';if(!l.password)l.password=randomPassword();if(!l.email)l.email=(l.name||('learner'+i)).toLowerCase().replaceAll(' ','.')+'@example.com'});
 }
 migrateState();
 if(!state.instructors[activeUserId]&&!Object.values(state.learners).some(l=>l.userId===activeUserId))activeUserId='I1';
 function currentUser(){if(!activeUserId)return null;return state.instructors?.[activeUserId]||Object.values(state.learners).find(l=>l.userId===activeUserId)||null}
-function currentRole(){let u=currentUser();return u?.role||'learner'}
-function isInstructor(){return currentRole()==='instructor'}
-function visibleLearners(){return isInstructor()?Object.values(state.learners).filter(l=>l.instructorUserId===activeUserId):Object.values(state.learners).filter(l=>l.userId===activeUserId)}
+function rawRole(){let u=currentUser();return u?.role||'learner'}
+function currentRole(){return rawRole()==='admin'?'instructor':rawRole()}
+function isAdmin(){return rawRole()==='admin'}
+function isInstructor(){return ['instructor','admin'].includes(rawRole())}
+function visibleLearners(){return isAdmin()?Object.values(state.learners):isInstructor()?Object.values(state.learners).filter(l=>l.instructorUserId===activeUserId):Object.values(state.learners).filter(l=>l.userId===activeUserId)}
 function ensureCurrentLearner(){let rows=visibleLearners();if(!rows.length)return;if(!state.learners[currentId]||(!isInstructor()&&state.learners[currentId].userId!==activeUserId)||(isInstructor()&&state.learners[currentId].instructorUserId!==activeUserId)){currentId=rows[0].id;state.currentId=currentId}}
 function save(){state.activeUserId=activeUserId;localStorage.setItem('ada_complete_master_demo',JSON.stringify(state));localStorage.setItem('ada_active_user_id',activeUserId||'');if(!isCloudLoading)queueCloudSave();renderAll()}
 function L(){ensureCurrentLearner();return state.learners[currentId]||visibleLearners()[0]||Object.values(state.learners)[0]}
@@ -206,6 +210,7 @@ function applyRoleView(){
   document.querySelectorAll('.actions button,.actions .btn').forEach(el=>el.classList.toggle('hidden',!isInstructor()));
   let badge=document.getElementById('roleBadge'), learnerBadge=document.getElementById('currentLearnerBadge');
   if(!u){badge.textContent='Signed out';learnerBadge.classList.add('hidden')}
+  else if(isAdmin()){badge.textContent='Admin: '+u.name;learnerBadge.textContent='Admin access - '+visibleLearners().length+' learner records';learnerBadge.classList.remove('hidden')}
   else if(isInstructor()){badge.textContent='Instructor: '+u.name;learnerBadge.textContent='Master access - '+visibleLearners().length+' learner records';learnerBadge.classList.remove('hidden')}
   else{badge.textContent='Learner: '+u.name;learnerBadge.textContent='Own record only';learnerBadge.classList.remove('hidden')}
   document.getElementById('authState').value=u?(isInstructor()?'Instructor access':'Learner access'):'Signed out';
@@ -218,7 +223,31 @@ function mockTotals(m){let df=0,s=0,d=0;Object.values(m.marks||{}).forEach(v=>{i
 function result(t){return (t.s>0||t.d>0||t.df>15)?'FAIL':'PASS'}
 function renderLearners(){let q=(document.getElementById('search')?.value||'').toLowerCase();let rows=visibleLearners().filter(l=>(l.name+l.email+l.testCentre).toLowerCase().includes(q));ensureCurrentLearner();document.getElementById('dashCards').innerHTML=`<div class="card">Current Learners<br><strong>${rows.length}</strong></div><div class="card">Selected Learner<br><strong>${L().name.split(' ')[0]}</strong></div><div class="card">Ready Score<br><strong>${readiness(L())}%</strong></div><div class="card">Mock Tests<br><strong>${L().mocks.length}</strong></div>`;
 document.getElementById('learnerTable').innerHTML='<table><thead><tr><th>Learner</th><th>Progress</th><th>Ready</th><th>Test Date</th><th>Generated Login</th><th>Open</th></tr></thead><tbody>'+rows.map(l=>`<tr><td><strong>${l.name}</strong><br><span class="small">${l.testCentre}</span></td><td><div class="progress"><div class="bar" style="width:${readiness(l)}%"></div></div></td><td><strong>${readiness(l)}%</strong></td><td>${l.target||'-'}</td><td>${l.email}<br><span class="small">${l.password}</span></td><td><button onclick="currentId='${l.id}';state.currentId=currentId;save()">Open</button></td></tr>`).join('')+'</tbody></table>'}
-function renderDetails(){document.getElementById('learnerTitle').textContent=L().name+' - Learner Details';document.querySelectorAll('[data-field]').forEach(el=>el.value=L()[el.dataset.field]||'')}
+function renderInstructorOptions(){
+  let select=document.getElementById('instructorAssign');
+  if(!select)return;
+  select.innerHTML=Object.values(state.instructors).filter(i=>i.role!=='admin').map(i=>`<option value="${i.id}" ${L().instructorUserId===i.id?'selected':''}>${i.name}</option>`).join('');
+  select.disabled=!isAdmin();
+  let amelia=document.getElementById('ameliaEmployeeId'), instructor=allocatedInstructor(L());
+  if(amelia){amelia.value=instructor.ameliaEmployeeId||'';amelia.disabled=!isAdmin()}
+}
+function assignLearnerInstructor(instructorId){
+  if(!isAdmin())return;
+  let instructor=state.instructors[instructorId];
+  if(!instructor)return;
+  L().instructorUserId=instructorId;
+  L().instructor=instructor.name;
+  save();
+}
+function updateAllocatedInstructorAmeliaId(value){
+  if(!isAdmin())return;
+  let instructor=allocatedInstructor(L());
+  if(!instructor.id)return;
+  state.instructors[instructor.id].ameliaEmployeeId=value.trim();
+  save();
+}
+function allocatedInstructor(l){return state.instructors?.[l.instructorUserId]||Object.values(state.instructors||{}).find(i=>i.name===l.instructor)||{}}
+function renderDetails(){document.getElementById('learnerTitle').textContent=L().name+' - Learner Details';document.querySelectorAll('[data-field]').forEach(el=>el.value=L()[el.dataset.field]||'');renderInstructorOptions()}
 function renderTracker(){let counts={not_started:0,introduced:0,helped:0,prompted:0,independent:0,reflection:0};L().skills.forEach(s=>counts[s.stage]++);document.getElementById('skillSummary').innerHTML=['introduced','helped','prompted','independent','reflection'].map(k=>`<div class="card">${k.replace('_',' ')}<br><strong>${counts[k]} / 27</strong></div>`).join('');
 let group='', html='<table><thead><tr><th>No.</th><th>Skill</th><th>Stage</th><th>Instructor Notes</th></tr></thead><tbody>';skills.forEach((s,i)=>{if(s[0]!=group){group=s[0];html+=`<tr class="group"><td colspan="4">${group}</td></tr>`}let stage=L().skills[i].stage;html+=`<tr><td>${i+1}</td><td>${s[1]}</td><td>${isInstructor()?`<select onchange="L().skills[${i}].stage=this.value;save()">${stages.map(st=>`<option value="${st}" ${stage==st?'selected':''}>${st.replace('_',' ')}</option>`).join('')}</select>`:stage.replace('_',' ')}</td><td>${isInstructor()?`<textarea onchange="L().skills[${i}].notes=this.value;save()">${L().skills[i].notes||''}</textarea>`:(L().skills[i].notes||'')}</td></tr>`});document.getElementById('trackerTable').innerHTML=html+'</tbody></table>'}
 function renderLessons(){document.getElementById('lessonList').innerHTML=L().lessons.map((x,i)=>`<div class="lesson"><h3>Lesson ${i+1}</h3><div class="grid"><div><label>Date</label><input value="${x.date||''}" onchange="L().lessons[${i}].date=this.value;save()"></div><div><label>Duration</label><input value="${x.duration||''}" onchange="L().lessons[${i}].duration=this.value;save()"></div><div><label>Objectives</label><textarea onchange="L().lessons[${i}].objectives=this.value;save()">${x.objectives||''}</textarea></div><div><label>Instructor Notes</label><textarea onchange="L().lessons[${i}].notes=this.value;save()">${x.notes||''}</textarea></div><div><label>Homework</label><textarea onchange="L().lessons[${i}].homework=this.value;save()">${x.homework||''}</textarea></div><div><label>Learner Reflection</label><textarea onchange="L().lessons[${i}].reflection=this.value;save()">${x.reflection||''}</textarea></div></div></div>`).join('')}
@@ -235,13 +264,32 @@ function bookingUrlFor(l){
   let url;
   try{url=new URL(appConfig.ameliaBookingUrl||'https://allisondriveracademy.com/enquiry/',window.location.href)}
   catch(_err){url=new URL('https://allisondriveracademy.com/enquiry/')}
-  [['ada_learner_id',l.id],['ada_learner_name',l.name],['ada_learner_email',l.email],['ada_learner_phone',l.phone],['ada_instructor',l.instructor],['ada_vehicle',l.vehicle],['ada_test_centre',l.testCentre]].forEach(([k,v])=>{if(v)url.searchParams.set(k,v)});
+  let instructor=allocatedInstructor(l);
+  [['ada_learner_id',l.id],['ada_learner_name',l.name],['ada_learner_email',l.email],['ada_learner_phone',l.phone],['ada_instructor_user_id',l.instructorUserId],['ada_instructor',instructor.name||l.instructor],['employeeId',instructor.ameliaEmployeeId],['providerId',instructor.ameliaEmployeeId],['ada_vehicle',l.vehicle],['ada_test_centre',l.testCentre]].forEach(([k,v])=>{if(v)url.searchParams.set(k,v)});
   return url.toString();
 }
-function openAmeliaBooking(){
-  let l=L();
-  state.bookingRequests.unshift({id:'BR'+Date.now(),createdAt:new Date().toISOString(),learnerId:l.id,learnerName:l.name,email:l.email,phone:l.phone,vehicle:l.vehicle,testCentre:l.testCentre,status:'Booking link opened',source:'Learner portal'});
+function bookingPayload(l,status,service,source){
+  return {id:'BR'+Date.now(),createdAt:new Date().toISOString(),learnerId:l.id,learnerName:l.name,email:l.email,phone:l.phone,instructor:l.instructor,vehicle:l.vehicle,testCentre:l.testCentre,status,service,source};
+}
+async function saveBookingRequest(payload){
+  state.bookingRequests.unshift(payload);
   save();
+  try{
+    let res=await fetch('/api/bookings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if(res.ok){
+      let data=await res.json();
+      if(data.booking){
+        state.bookingRequests=state.bookingRequests.filter(b=>b.id!==payload.id);
+        state.bookingRequests.unshift(data.booking);
+        localStorage.setItem('ada_complete_master_demo',JSON.stringify(state));
+        renderBookings();
+      }
+    }
+  }catch(_err){}
+}
+async function openAmeliaBooking(){
+  let l=L();
+  await saveBookingRequest(bookingPayload(l,'Pending payment','Lesson booking','Learner portal'));
   window.open(bookingUrlFor(l),'_blank');
 }
 async function loadBookings(){
@@ -258,7 +306,7 @@ async function loadBookings(){
   }catch(_err){}
   renderBookings();
 }
-function renderLearnerView(){document.getElementById('learnerCards').innerHTML=`<div class="card">Current Readiness<br><strong>${readiness(L())}%</strong></div><div class="card">Private Practice<br><strong>${L().practices.length}</strong></div><div class="card">Lessons<br><strong>${L().lessons.length}</strong></div><div class="card">Mocks<br><strong>${L().mocks.length}</strong></div>`;document.getElementById('learnerBookingPanel').innerHTML=`<h3>Book a Lesson</h3><p class="small">This opens the booking page with your learner details attached for the instructor/admin portal.</p><button onclick="openAmeliaBooking()">Book Lesson</button>`;document.getElementById('learnerLockedProgress').innerHTML=document.getElementById('trackerTable').innerHTML}
+function renderLearnerView(){let instructor=allocatedInstructor(L());document.getElementById('learnerCards').innerHTML=`<div class="card">Current Readiness<br><strong>${readiness(L())}%</strong></div><div class="card">Private Practice<br><strong>${L().practices.length}</strong></div><div class="card">Lessons<br><strong>${L().lessons.length}</strong></div><div class="card">Mocks<br><strong>${L().mocks.length}</strong></div>`;document.getElementById('learnerBookingPanel').innerHTML=`<h3>Book a Lesson</h3><p class="small">This opens ${instructor.name||'your allocated instructor'}'s Amelia diary. Choose an available slot there; the booking stays pending until payment is made.</p><div class="actions" style="margin-left:0"><button onclick="openAmeliaBooking()">Open Instructor Diary</button></div>`;document.getElementById('learnerLockedProgress').innerHTML=document.getElementById('trackerTable').innerHTML}
 function learnerAddPractice(){let note=document.getElementById('learnerPracticeNote').value;if(note){L().practices.push({date:new Date().toLocaleDateString('en-GB'),supervisor:'Learner entry',notes:note});document.getElementById('learnerPracticeNote').value='';save()}}
 function learnerAddReflection(){let note=document.getElementById('learnerReflectionNote').value;if(note){if(!L().lessons.length)L().lessons.push({date:new Date().toLocaleDateString('en-GB')});L().lessons[L().lessons.length-1].reflection=note;document.getElementById('learnerReflectionNote').value='';save()}}
 function newLearner(){if(!isInstructor()){alert('Only instructors can create learners.');return}let name=prompt('Learner name?');if(!name)return;let id='L'+Date.now(), email=(prompt('Learner email/login?',name.toLowerCase().replaceAll(' ','.')+'@example.com')||'').trim();if(!email)return;let password=randomPassword();state.learners[id]={id,userId:'U_'+id,instructorUserId:activeUserId,name,instructor:currentUser().name,start:new Date().toLocaleDateString('en-GB'),target:'',testCentre:'',vehicle:'Manual',phone:'',email,password,status:'Open',skills:skills.map(()=>({stage:'not_started',notes:''})),lessons:[],practices:[],mocks:[],finalNotes:''};currentId=id;state.currentId=id;save();alert('Learner login generated:\\n\\nEmail: '+email+'\\nPassword: '+password+'\\n\\nGive these details to the learner. They will only see their own learner portal.')}
