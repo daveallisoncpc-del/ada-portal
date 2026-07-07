@@ -26,9 +26,27 @@ create table if not exists public.portal_states (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.booking_requests (
+  id uuid primary key default gen_random_uuid(),
+  source text not null default 'Amelia',
+  status text not null default 'New',
+  learner_id text,
+  learner_name text,
+  email text,
+  phone text,
+  instructor text,
+  vehicle text,
+  test_centre text,
+  service text,
+  booking_time text,
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
 alter table public.profiles enable row level security;
 alter table public.learner_records enable row level security;
 alter table public.portal_states enable row level security;
+alter table public.booking_requests enable row level security;
 
 create or replace function public.current_role()
 returns text
@@ -104,5 +122,14 @@ to authenticated
 using (auth.uid() = user_id)
 with check (auth.uid() = user_id);
 
+drop policy if exists "Instructors can read booking requests" on public.booking_requests;
+create policy "Instructors can read booking requests"
+on public.booking_requests
+for select
+to authenticated
+using (public.current_role() = 'instructor');
+
 create index if not exists learner_records_instructor_id_idx on public.learner_records(instructor_id);
 create index if not exists learner_records_learner_user_id_idx on public.learner_records(learner_user_id);
+create index if not exists booking_requests_created_at_idx on public.booking_requests(created_at desc);
+create index if not exists booking_requests_learner_id_idx on public.booking_requests(learner_id);
