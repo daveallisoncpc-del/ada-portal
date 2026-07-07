@@ -9,13 +9,24 @@ function pick(...values) {
   return values.find(value => value !== undefined && value !== null && value !== "") || "";
 }
 
+function bookingStatus(body, appointment, customFields) {
+  const paymentStatus = String(pick(
+    customFields.ada_payment_status,
+    appointment.paymentStatus,
+    appointment.payment_status,
+    body.paymentStatus,
+    body.payment_status
+  )).toLowerCase();
+  return ["paid", "succeeded", "complete", "completed"].includes(paymentStatus) ? "Paid - confirmed" : "Pending payment";
+}
+
 function normaliseBooking(body) {
   const appointment = body.appointment || body.booking || body.data || body;
   const customer = body.customer || appointment.customer || appointment.customerData || {};
   const customFields = appointment.customFields || appointment.custom_fields || body.customFields || {};
   return {
     source: "Amelia",
-    status: pick(appointment.status, body.status, "New"),
+    status: bookingStatus(body, appointment, customFields),
     learner_id: pick(customFields.ada_learner_id, body.ada_learner_id, appointment.ada_learner_id),
     learner_name: pick(customFields.ada_learner_name, customer.fullName, customer.name, body.learnerName, body.name),
     email: pick(customFields.ada_learner_email, customer.email, body.email),
