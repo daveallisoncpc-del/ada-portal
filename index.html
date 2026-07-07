@@ -68,6 +68,7 @@ Learner: <code>john@example.com</code> / <code>Pass1234!</code>
 <button class="tab" data-role="instructor" onclick="showPage('practice',this)">Private Practice</button>
 <button class="tab" data-role="instructor" onclick="showPage('mock',this)">Mock Tests / DL25</button>
 <button class="tab" data-role="instructor" onclick="showPage('ready',this)">Ready to Pass</button>
+<button class="tab" data-role="instructor" onclick="showPage('bookings',this)">Bookings</button>
 <button class="tab" data-role="learner" onclick="showPage('learnerView',this)">Learner Portal</button>
 </div>
 
@@ -122,10 +123,18 @@ Learner: <code>john@example.com</code> / <code>Pass1234!</code>
 </div>
 </section>
 
+<section id="bookings" class="page">
+<h2>Bookings</h2>
+<button onclick="loadBookings()">Refresh Bookings</button>
+<div id="bookingSummary" class="small"></div>
+<div id="bookingTable"></div>
+</section>
+
 <section id="learnerView" class="page">
 <h2>Learner Login View</h2>
 <div class="notice"><strong>Learner permissions:</strong> the learner can add private practice and lesson reflection notes only. 27 skills, lesson notes and mock tests are visible but locked.</div>
 <div class="cards" id="learnerCards"></div>
+<div class="lesson" id="learnerBookingPanel"></div>
 <h3>Locked Progress Summary</h3><div id="learnerLockedProgress" class="locked"></div>
 <h3>Editable by Learner</h3>
 <div class="grid">
@@ -146,6 +155,7 @@ const stages=['not_started','introduced','helped','prompted','independent','refl
 const dl25Areas=['Eyesight / safety questions','Move off - safety','Move off - control','Control - steering','Control - gears','Control - footbrake','Control - clutch','Mirrors - signal','Mirrors - change direction','Mirrors - change speed','Signals - necessary','Signals - correctly','Junctions - approach speed','Junctions - observation','Junctions - turning right','Junctions - turning left','Roundabouts','Progress - speed','Progress - undue hesitation','Positioning - normal driving','Positioning - lane discipline','Clearance / obstructions','Response to signs / signals','Planning / awareness','Meeting / crossing traffic','Manoeuvre','Emergency stop','Independent driving'];
 let state=JSON.parse(localStorage.getItem('ada_complete_master_demo')||'null')||seed();
 let activeUserId=localStorage.getItem('ada_active_user_id')||'I1', currentId=state.currentId, openMockIndex=null, supabaseClient=null, supabaseSession=null, saveTimer=null, isCloudLoading=false;
+let appConfig={ameliaBookingUrl:'https://allisondriveracademy.com/enquiry/'};
 function makeLearner(id,name,email,password,instructorUserId,extras={}){
   return Object.assign({id,userId:id+'U',instructorUserId,name,instructor:state?.instructors?.[instructorUserId]?.name||'Dave Allison',start:new Date().toLocaleDateString('en-GB'),target:'',testCentre:'',vehicle:'Manual',phone:'',email,password,status:'Open',skills:skills.map(()=>({stage:'not_started',notes:''})),lessons:[],practices:[],mocks:[],finalNotes:''},extras);
 }
@@ -165,6 +175,7 @@ function seed(){
 }
 function migrateState(){
   if(!state.instructors)state.instructors=seed().instructors;
+  if(!Array.isArray(state.bookingRequests))state.bookingRequests=[];
   Object.values(state.learners||{}).forEach((l,i)=>{if(!l.userId)l.userId='U_'+l.id;if(!l.instructorUserId)l.instructorUserId='I1';if(!l.password)l.password=randomPassword();if(!l.email)l.email=(l.name||('learner'+i)).toLowerCase().replaceAll(' ','.')+'@example.com'});
 }
 migrateState();
@@ -215,7 +226,39 @@ function renderPractice(){document.getElementById('practiceList').innerHTML=L().
 function renderMocks(){document.getElementById('mockList').innerHTML=L().mocks.map((m,i)=>{let t=mockTotals(m);return `<div class="lesson"><h3>Mock Test ${i+1} - ${result(t)}</h3><div class="grid"><div><label>Date</label><input value="${m.date||''}" onchange="L().mocks[${i}].date=this.value;save()"></div><div><label>Route</label><input value="${m.route||''}" onchange="L().mocks[${i}].route=this.value;save()"></div><div><label>Weather</label><input value="${m.weather||''}" onchange="L().mocks[${i}].weather=this.value;save()"></div><div><label>Examiner</label><input value="${m.examiner||''}" onchange="L().mocks[${i}].examiner=this.value;save()"></div></div><div class="cards"><div class="card">Driving Faults<br><strong>${t.df}</strong></div><div class="card">Serious<br><strong>${t.s}</strong></div><div class="card">Dangerous<br><strong>${t.d}</strong></div><div class="card">Result<br><strong>${result(t)}</strong></div></div><button onclick="openDL25(${i})">Open Clickable DL25 Sheet</button><div class="grid"><div><label>Instructor Debrief</label><textarea onchange="L().mocks[${i}].debrief=this.value;save()">${m.debrief||''}</textarea></div><div><label>Learner Reflection</label><textarea onchange="L().mocks[${i}].reflection=this.value;save()">${m.reflection||''}</textarea></div></div></div>`}).join('')}
 function addLesson(){L().lessons.push({date:new Date().toLocaleDateString('en-GB')});save()}function addPractice(){L().practices.push({date:new Date().toLocaleDateString('en-GB')});save()}function addMock(){L().mocks.push({date:new Date().toLocaleDateString('en-GB'),marks:{}});save()}
 function renderReady(){let r=readiness(L());let bar=document.getElementById('readyBar');bar.style.width=r+'%';bar.className='bar '+(r>=80?'green':r>=50?'amber':'');document.getElementById('readyText').innerHTML=`<strong>${r}%</strong> - ${r>=85?'Test ready':r>=65?'Nearly ready':r>=40?'Developing':'Early stage'}`;let pri=L().skills.map((s,i)=>({i,s})).filter(x=>!['independent','reflection'].includes(x.s.stage)).slice(0,5).map(x=>skills[x.i][1]).join('\\n');document.getElementById('priorities').value=pri||'Maintain independence and test readiness.'}
-function renderLearnerView(){document.getElementById('learnerCards').innerHTML=`<div class="card">Current Readiness<br><strong>${readiness(L())}%</strong></div><div class="card">Private Practice<br><strong>${L().practices.length}</strong></div><div class="card">Lessons<br><strong>${L().lessons.length}</strong></div><div class="card">Mocks<br><strong>${L().mocks.length}</strong></div>`;document.getElementById('learnerLockedProgress').innerHTML=document.getElementById('trackerTable').innerHTML}
+function renderBookings(){
+  let rows=state.bookingRequests||[];
+  document.getElementById('bookingSummary').textContent=rows.length?'Latest Amelia and learner booking activity.':'No booking activity yet.';
+  document.getElementById('bookingTable').innerHTML='<table><thead><tr><th>Date</th><th>Learner</th><th>Contact</th><th>Booking</th><th>Status</th><th>Source</th></tr></thead><tbody>'+rows.map(b=>`<tr><td>${new Date(b.createdAt||b.date||Date.now()).toLocaleString('en-GB')}</td><td><strong>${b.learnerName||b.name||'-'}</strong><br><span class="small">${b.vehicle||''} ${b.testCentre||''}</span></td><td>${b.email||'-'}<br><span class="small">${b.phone||''}</span></td><td>${b.service||b.appointment||'Lesson booking'}<br><span class="small">${b.bookingTime||b.startTime||b.dateTime||''}</span></td><td>${b.status||'New'}</td><td>${b.source||'Amelia'}</td></tr>`).join('')+'</tbody></table>';
+}
+function bookingUrlFor(l){
+  let url;
+  try{url=new URL(appConfig.ameliaBookingUrl||'https://allisondriveracademy.com/enquiry/',window.location.href)}
+  catch(_err){url=new URL('https://allisondriveracademy.com/enquiry/')}
+  [['ada_learner_id',l.id],['ada_learner_name',l.name],['ada_learner_email',l.email],['ada_learner_phone',l.phone],['ada_instructor',l.instructor],['ada_vehicle',l.vehicle],['ada_test_centre',l.testCentre]].forEach(([k,v])=>{if(v)url.searchParams.set(k,v)});
+  return url.toString();
+}
+function openAmeliaBooking(){
+  let l=L();
+  state.bookingRequests.unshift({id:'BR'+Date.now(),createdAt:new Date().toISOString(),learnerId:l.id,learnerName:l.name,email:l.email,phone:l.phone,vehicle:l.vehicle,testCentre:l.testCentre,status:'Booking link opened',source:'Learner portal'});
+  save();
+  window.open(bookingUrlFor(l),'_blank');
+}
+async function loadBookings(){
+  try{
+    let res=await fetch('/api/bookings');
+    if(res.ok){
+      let data=await res.json();
+      let cloudRows=Array.isArray(data.bookings)?data.bookings:[];
+      let localRows=state.bookingRequests||[];
+      let known=new Set(localRows.map(b=>b.id||b.createdAt));
+      state.bookingRequests=localRows.concat(cloudRows.filter(b=>!known.has(b.id||b.createdAt))).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
+      localStorage.setItem('ada_complete_master_demo',JSON.stringify(state));
+    }
+  }catch(_err){}
+  renderBookings();
+}
+function renderLearnerView(){document.getElementById('learnerCards').innerHTML=`<div class="card">Current Readiness<br><strong>${readiness(L())}%</strong></div><div class="card">Private Practice<br><strong>${L().practices.length}</strong></div><div class="card">Lessons<br><strong>${L().lessons.length}</strong></div><div class="card">Mocks<br><strong>${L().mocks.length}</strong></div>`;document.getElementById('learnerBookingPanel').innerHTML=`<h3>Book a Lesson</h3><p class="small">This opens the booking page with your learner details attached for the instructor/admin portal.</p><button onclick="openAmeliaBooking()">Book Lesson</button>`;document.getElementById('learnerLockedProgress').innerHTML=document.getElementById('trackerTable').innerHTML}
 function learnerAddPractice(){let note=document.getElementById('learnerPracticeNote').value;if(note){L().practices.push({date:new Date().toLocaleDateString('en-GB'),supervisor:'Learner entry',notes:note});document.getElementById('learnerPracticeNote').value='';save()}}
 function learnerAddReflection(){let note=document.getElementById('learnerReflectionNote').value;if(note){if(!L().lessons.length)L().lessons.push({date:new Date().toLocaleDateString('en-GB')});L().lessons[L().lessons.length-1].reflection=note;document.getElementById('learnerReflectionNote').value='';save()}}
 function newLearner(){if(!isInstructor()){alert('Only instructors can create learners.');return}let name=prompt('Learner name?');if(!name)return;let id='L'+Date.now(), email=(prompt('Learner email/login?',name.toLowerCase().replaceAll(' ','.')+'@example.com')||'').trim();if(!email)return;let password=randomPassword();state.learners[id]={id,userId:'U_'+id,instructorUserId:activeUserId,name,instructor:currentUser().name,start:new Date().toLocaleDateString('en-GB'),target:'',testCentre:'',vehicle:'Manual',phone:'',email,password,status:'Open',skills:skills.map(()=>({stage:'not_started',notes:''})),lessons:[],practices:[],mocks:[],finalNotes:''};currentId=id;state.currentId=id;save();alert('Learner login generated:\\n\\nEmail: '+email+'\\nPassword: '+password+'\\n\\nGive these details to the learner. They will only see their own learner portal.')}
@@ -226,7 +269,7 @@ function toggleMark(key,type){let marks=L().mocks[openMockIndex].marks;if(marks[
 function exportData(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));a.download='allison-driver-academy-master-data.json';a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{state=JSON.parse(r.result);currentId=state.currentId;save()};r.readAsText(f)}
 function resetDemo(){if(confirm('Reset demo data?')){localStorage.removeItem('ada_complete_master_demo');state=seed();currentId=state.currentId;save()}}
-function renderAll(){applyRoleView();renderLearners();renderDetails();renderTracker();renderLessons();renderPractice();renderMocks();renderReady();renderLearnerView()}
+function renderAll(){applyRoleView();renderLearners();renderDetails();renderTracker();renderLessons();renderPractice();renderMocks();renderReady();renderBookings();renderLearnerView()}
 renderAll();
 
 function setSyncStatus(message){
@@ -239,6 +282,7 @@ async function initSupabase(){
     let res=await fetch('/api/config');
     if(!res.ok){setSyncStatus('Local demo mode. Supabase config is not available yet.');return}
     let cfg=await res.json();
+    appConfig.ameliaBookingUrl=cfg.ameliaBookingUrl||appConfig.ameliaBookingUrl;
     if(!cfg.supabaseUrl||!cfg.supabaseAnonKey){setSyncStatus('Local demo mode. Add Supabase environment variables in Vercel.');return}
     supabaseClient=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
     let sessionResult=await supabaseClient.auth.getSession();
