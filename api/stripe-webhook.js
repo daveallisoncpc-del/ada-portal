@@ -44,6 +44,7 @@ async function supabaseRequest(path, options = {}) {
 }
 
 async function confirmBooking(booking) {
+  if (booking.status !== "Paid - confirmed") return { ignored: true, reason: "Payment is not complete." };
   if (!booking.learner_id && !booking.email) {
     const rows = await supabaseRequest("booking_requests", {
       method: "POST",
@@ -53,8 +54,8 @@ async function confirmBooking(booking) {
     return rows[0] || booking;
   }
   const filters = [];
-  if (booking.learner_id) filters.push(`learner_id=eq.${encodeURIComponent(booking.learner_id)}`);
-  if (booking.email) filters.push(`email=eq.${encodeURIComponent(booking.email)}`);
+  if (booking.learner_id) filters.push(`learner_id.eq.${encodeURIComponent(booking.learner_id)}`);
+  if (booking.email) filters.push(`email.eq.${encodeURIComponent(booking.email)}`);
   const existing = filters.length ? await supabaseRequest(`booking_requests?select=*&or=(${filters.join(",")})&order=created_at.desc&limit=1`) : [];
   if (existing.skipped) return existing;
   if (Array.isArray(existing) && existing[0]?.id) {
