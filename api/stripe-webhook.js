@@ -82,7 +82,7 @@ async function confirmBooking(booking) {
 
 async function sendNotificationEmail(to, subject, text) {
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.NOTIFICATION_FROM_EMAIL;
+  const from = process.env.NOTIFICATION_FROM_EMAIL || "payments@allisondriveracademy.com";
   if (!apiKey || !from || !to) return { skipped: true };
   const result = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -94,8 +94,8 @@ async function sendNotificationEmail(to, subject, text) {
 }
 
 async function sendNotifications(booking) {
-  const adminEmail = process.env.NOTIFICATION_ADMIN_EMAIL;
-  const instructorEmail = process.env.NOTIFICATION_INSTRUCTOR_EMAIL;
+  const adminEmail = process.env.NOTIFICATION_ADMIN_EMAIL || "admin@allisondriveracademy.com";
+  const instructorEmail = process.env.NOTIFICATION_INSTRUCTOR_EMAIL || "dave@allison-cpc.co.uk";
   const learnerEmail = booking.email;
   const when = booking.booking_time || "the selected Amelia slot";
   const learnerName = booking.learner_name || "Learner";
