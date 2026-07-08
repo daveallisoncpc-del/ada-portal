@@ -156,7 +156,7 @@ const dl25Areas=['Eyesight / safety questions','Move off - safety','Move off - c
 let state=JSON.parse(localStorage.getItem('ada_complete_master_demo')||'null')||seed();
 const privateBookingRequested=new URLSearchParams(window.location.search).get('approvedBooking')==='1';
 let activeUserId=localStorage.getItem('ada_active_user_id')||(privateBookingRequested?'':'I1'), currentId=state.currentId, openMockIndex=null, supabaseClient=null, supabaseSession=null, saveTimer=null, isCloudLoading=false;
-let appConfig={ameliaBookingUrl:'https://allisondriveracademy.com/enquiry/',approvedLearnerBookingUrl:'https://allisondriveracademy.com/enquiry/'};
+let appConfig={ameliaBookingUrl:'https://allisondriveracademy.com/enquiry/',approvedLearnerBookingUrl:'https://allisondriveracademy.com/enquiry/',paymentRedirectUrl:'/api/payment-link'};
 function makeLearner(id,name,email,password,instructorUserId,extras={}){
   return Object.assign({id,userId:id+'U',instructorUserId,name,instructor:state?.instructors?.[instructorUserId]?.name||'Dave Allison',start:new Date().toLocaleDateString('en-GB'),target:'',testCentre:'',vehicle:'Manual',phone:'',email,password,status:'Open',skills:skills.map(()=>({stage:'not_started',notes:''})),lessons:[],practices:[],mocks:[],finalNotes:''},extras);
 }
@@ -267,7 +267,8 @@ function bookingUrlFor(l){
   try{url=new URL(base||'https://allisondriveracademy.com/enquiry/',window.location.href)}
   catch(_err){url=new URL('https://allisondriveracademy.com/enquiry/')}
   let instructor=allocatedInstructor(l);
-  [['ada_learner_id',l.id],['ada_learner_name',l.name],['ada_learner_email',l.email],['ada_learner_phone',l.phone],['ada_instructor_user_id',l.instructorUserId],['ada_instructor',instructor.name||l.instructor],['employeeId',instructor.ameliaEmployeeId],['providerId',instructor.ameliaEmployeeId],['ada_vehicle',l.vehicle],['ada_test_centre',l.testCentre]].forEach(([k,v])=>{if(v)url.searchParams.set(k,v)});
+  let paymentUrl=new URL(appConfig.paymentRedirectUrl||'/api/payment-link',window.location.href);
+  [['ada_learner_id',l.id],['ada_learner_name',l.name],['ada_learner_email',l.email],['ada_learner_phone',l.phone],['ada_instructor_user_id',l.instructorUserId],['ada_instructor',instructor.name||l.instructor],['employeeId',instructor.ameliaEmployeeId],['providerId',instructor.ameliaEmployeeId],['ada_vehicle',l.vehicle],['ada_test_centre',l.testCentre],['ada_payment_url',paymentUrl.toString()],['payment_url',paymentUrl.toString()]].forEach(([k,v])=>{if(v)url.searchParams.set(k,v)});
   return url.toString();
 }
 function isLearnerApproved(l){return (l.status||'').toLowerCase()==='approved'}
@@ -337,6 +338,7 @@ async function initSupabase(){
     let cfg=await res.json();
     appConfig.ameliaBookingUrl=cfg.ameliaBookingUrl||appConfig.ameliaBookingUrl;
     appConfig.approvedLearnerBookingUrl=cfg.approvedLearnerBookingUrl||appConfig.approvedLearnerBookingUrl;
+    appConfig.paymentRedirectUrl=cfg.paymentRedirectUrl||appConfig.paymentRedirectUrl;
     if(!cfg.supabaseUrl||!cfg.supabaseAnonKey){setSyncStatus('Local demo mode. Add Supabase environment variables in Vercel.');return}
     supabaseClient=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
     let sessionResult=await supabaseClient.auth.getSession();
