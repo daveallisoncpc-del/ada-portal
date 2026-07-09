@@ -177,6 +177,24 @@ function migrateState(){
 migrateState();
 if(!state.instructors[activeUserId]&&!Object.values(state.learners).some(l=>l.userId===activeUserId))activeUserId='';
 function currentUser(){if(!activeUserId)return null;return state.instructors?.[activeUserId]||Object.values(state.learners).find(l=>l.userId===activeUserId)||null}
+function validUserId(userId){return !!(userId&&(state.instructors?.[userId]||Object.values(state.learners||{}).some(l=>l.userId===userId)))}
+function userIdForEmail(email){
+  email=(email||'').trim().toLowerCase();
+  if(!email)return '';
+  let instructor=Object.values(state.instructors||{}).find(u=>(u.email||'').trim().toLowerCase()===email);
+  if(instructor)return instructor.id;
+  let learner=Object.values(state.learners||{}).find(l=>(l.email||'').trim().toLowerCase()===email);
+  if(learner)return learner.userId;
+  if(email==='admin@allisondriveracademy.com'){
+    let admin=Object.values(state.instructors||{}).find(u=>u.role==='admin');
+    if(admin)return admin.id;
+  }
+  if(['dave@allison-cpc.co.uk','dave@allisondriveracademy.com'].includes(email)){
+    let dave=Object.values(state.instructors||{}).find(u=>(u.name||'').toLowerCase().includes('dave'));
+    if(dave)return dave.id;
+  }
+  return '';
+}
 function rawRole(){let u=currentUser();return u?.role||'learner'}
 function currentRole(){return rawRole()==='admin'?'instructor':rawRole()}
 function isAdmin(){return rawRole()==='admin'}
@@ -363,8 +381,9 @@ async function signIn(){
     return;
   }
   if(!supabaseClient){setSyncStatus('Login not found. Check the learner or instructor details and try again.');return}
-  let {error}=await supabaseClient.auth.signInWithPassword({email,password});
+  let {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
   if(error){setSyncStatus('Sign in failed: '+error.message);return}
+  supabaseSession=data.session;
   setSyncStatus('Signed in. Loading cloud data.');
   await loadCloudState();
   if(privateBookingRequested&&!isInstructor())showPage('learnerView');
@@ -408,11 +427,17 @@ async function loadCloudState(){
   if(error){setSyncStatus('Cloud load failed: '+error.message);isCloudLoading=false;return}
   if(data&&data.data){
     state=data.data;
+    migrateState();
+    activeUserId=userIdForEmail(supabaseSession.user.email)||state.activeUserId||activeUserId;
+    if(!validUserId(activeUserId))activeUserId='';
     currentId=state.currentId;
     localStorage.setItem('ada_complete_master_demo',JSON.stringify(state));
+    localStorage.setItem('ada_active_user_id',activeUserId||'');
     renderAll();
-    setSyncStatus('Loaded cloud data from Supabase.');
+    setSyncStatus(activeUserId?'Loaded cloud data from Supabase.':'Signed in, but no learner or instructor profile matched this email.');
   }else{
+    activeUserId=userIdForEmail(supabaseSession.user.email)||activeUserId;
+    if(!validUserId(activeUserId))activeUserId='';
     await saveCloudState();
   }
   isCloudLoading=false;
