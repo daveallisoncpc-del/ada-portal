@@ -480,6 +480,8 @@ async function loadCloudState(){
 }
 Object.assign(window,{signIn,signUp,signOut,syncNow});
 initSupabase();
+  document.getElementById('authEmail').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();signIn();}});
+  document.getElementById('authPassword').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();signIn();}});
 </script>
 </body>
 </html>
