@@ -193,6 +193,17 @@ function userIdForEmail(email){
     let dave=Object.values(state.instructors||{}).find(u=>(u.name||'').toLowerCase().includes('dave'));
     if(dave)return dave.id;
   }
+  if(email.endsWith('@allison-cpc.co.uk')||email.endsWith('@allisondriveracademy.com')){
+    let fallbackInstructor=Object.values(state.instructors||{}).find(u=>u.role==='instructor');
+    if(fallbackInstructor)return fallbackInstructor.id;
+  }
+  return '';
+}
+function resolveSignedInUserId(){
+  let email=supabaseSession?.user?.email||'';
+  let matched=userIdForEmail(email);
+  if(matched)return matched;
+  setSyncStatus('Signed in, but no learner or instructor profile matched '+email+'. Ask admin to add this email to a portal profile.');
   return '';
 }
 function rawRole(){let u=currentUser();return u?.role||'learner'}
@@ -428,7 +439,7 @@ async function loadCloudState(){
   if(data&&data.data){
     state=data.data;
     migrateState();
-    activeUserId=userIdForEmail(supabaseSession.user.email)||state.activeUserId||activeUserId;
+    activeUserId=resolveSignedInUserId();
     if(!validUserId(activeUserId))activeUserId='';
     currentId=state.currentId;
     localStorage.setItem('ada_complete_master_demo',JSON.stringify(state));
@@ -436,7 +447,7 @@ async function loadCloudState(){
     renderAll();
     setSyncStatus(activeUserId?'Loaded cloud data from Supabase.':'Signed in, but no learner or instructor profile matched this email.');
   }else{
-    activeUserId=userIdForEmail(supabaseSession.user.email)||activeUserId;
+    activeUserId=resolveSignedInUserId();
     if(!validUserId(activeUserId))activeUserId='';
     await saveCloudState();
   }
