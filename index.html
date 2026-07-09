@@ -199,9 +199,34 @@ function userIdForEmail(email){
   }
   return '';
 }
+function ensurePortalProfileForEmail(email){
+  email=(email||'').trim().toLowerCase();
+  if(!email)return '';
+  let existing=userIdForEmail(email);
+  if(existing)return existing;
+  state.instructors=state.instructors||{};
+  if(email==='admin@allisondriveracademy.com'){
+    state.instructors.I2=Object.assign({id:'I2',name:'Admin',password:'',ameliaEmployeeId:''},state.instructors.I2||{});
+    state.instructors.I2.email=email;
+    state.instructors.I2.role='admin';
+    return 'I2';
+  }
+  let approvedInstructorEmails={
+    'dave@allison-cpc.co.uk':'Dave Allison',
+    'dave@allisondriveracademy.com':'Dave Allison',
+    'payments@allisondriveracademy.com':'Payments'
+  };
+  if(approvedInstructorEmails[email]||email.endsWith('@allison-cpc.co.uk')||email.endsWith('@allisondriveracademy.com')){
+    let id=email.includes('dave')?'I1':'I_'+email.replace(/[^a-z0-9]/g,'_');
+    state.instructors[id]=Object.assign({id,name:approvedInstructorEmails[email]||email.split('@')[0],password:'',role:'instructor',ameliaEmployeeId:''},state.instructors[id]||{});
+    state.instructors[id].email=email;
+    return id;
+  }
+  return '';
+}
 function resolveSignedInUserId(){
   let email=supabaseSession?.user?.email||'';
-  let matched=userIdForEmail(email);
+  let matched=ensurePortalProfileForEmail(email);
   if(matched)return matched;
   setSyncStatus('Signed in, but no learner or instructor profile matched '+email+'. Ask admin to add this email to a portal profile.');
   return '';
