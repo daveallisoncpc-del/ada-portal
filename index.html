@@ -12,7 +12,7 @@
 .actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}button,.btn{background:var(--navy);color:white;border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;text-decoration:none}button.red{background:var(--red)}button.white{background:white;color:var(--navy);border:1px solid var(--line)}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.tab{background:white;color:var(--navy);border:1px solid var(--line)}.tab.active{background:var(--navy);color:white}
 .page{display:none;background:white;border-radius:16px;padding:18px;box-shadow:0 4px 18px rgba(0,0,0,.08);margin-bottom:18px}.page.active{display:block}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}.card{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--light)}.card strong{color:var(--navy);font-size:22px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}.card{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--light)}.card strong{color:var(--navy);font-size:22px}.admin-tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}.status-pill{display:inline-block;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:800;background:#e8eef6;color:var(--navy)}.status-pill.paid,.status-pill.approved{background:#dff5e8;color:#126438}.status-pill.pending{background:#fff3cf;color:#7a5500}.status-pill.rejected,.status-pill.failed{background:#fde1e2;color:#9c1116}.table-wrap{overflow-x:auto}
 label{font-size:12px;font-weight:700;color:var(--navy)}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;margin-top:4px}textarea{min-height:72px}
 table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}th{background:var(--navy);color:white;padding:8px;text-align:left}td{border:1px solid var(--line);padding:7px;vertical-align:top}.group td{background:var(--navy);color:white;font-weight:700}
 .progress{height:20px;background:#dce4ec;border-radius:99px;overflow:hidden}.bar{height:100%;background:var(--navy);border-radius:99px}.bar.green{background:var(--green)}.bar.amber{background:var(--amber)}
@@ -24,7 +24,7 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}th{back
 .auth-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.auth-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.sync-status{font-size:12px;color:#596575;font-weight:700;margin-top:8px}
 .role-strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.role-badge{background:#e8eef6;color:var(--navy);border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800}.credential-card{background:#f8fafc;border:1px dashed var(--line);border-radius:12px;padding:10px;margin-top:10px}.credential-card code{font-weight:800;color:var(--navy)}
 .footer{text-align:center;color:var(--navy);font-weight:700;font-size:12px;margin:20px}
-@media(max-width:760px){.header{display:block}.logo{max-width:100%;width:240px}.actions{margin-top:12px}.grid,.cards,.auth-panel,.auth-fields{grid-template-columns:1fr}.auth-actions{justify-content:flex-start}.modal{align-items:stretch;padding:0}.modal .box{max-height:100vh;border-radius:0;padding:10px}.dl25-scroll{max-width:100%;border-radius:8px}.dl25{font-size:11px;min-width:890px}.dl25-head{grid-template-columns:280px 120px 160px 100px}.dl25-title{font-size:15px}.dl25-row{grid-template-columns:34px 200px repeat(16,32px) 40px 40px}.dl25-row>div:nth-child(2){left:34px}.dl25-row div{min-height:36px;padding:5px 4px}.dl25-row .area{white-space:normal;line-height:1.15}table{font-size:11px}}
+@media(max-width:760px){.header{display:block}.logo{max-width:100%;width:240px}.actions{margin-top:12px}.grid,.cards,.admin-tools,.auth-panel,.auth-fields{grid-template-columns:1fr}.auth-actions{justify-content:flex-start}.modal{align-items:stretch;padding:0}.modal .box{max-height:100vh;border-radius:0;padding:10px}.dl25-scroll{max-width:100%;border-radius:8px}.dl25{font-size:11px;min-width:890px}.dl25-head{grid-template-columns:280px 120px 160px 100px}.dl25-title{font-size:15px}.dl25-row{grid-template-columns:34px 200px repeat(16,32px) 40px 40px}.dl25-row>div:nth-child(2){left:34px}.dl25-row div{min-height:36px;padding:5px 4px}.dl25-row .area{white-space:normal;line-height:1.15}table{font-size:11px}}
 @media print{body{background:white}.tabs,.actions,button,.no-print,.modal{display:none!important}.page{display:block;box-shadow:none;page-break-after:always;border-radius:0}.app{max-width:none;padding:0}.header{box-shadow:none}}
 </style>
 </head>
@@ -55,6 +55,7 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}th{back
 
 <div class="tabs">
 <button class="tab active" data-role="instructor" onclick="showPage('dashboard',this)">Dashboard</button>
+<button class="tab" data-role="instructor" data-admin-only="true" onclick="showPage('adminHub',this)">Admin Hub</button>
 <button class="tab" data-role="instructor" onclick="showPage('details',this)">Learner</button>
 <button class="tab" data-role="instructor" onclick="showPage('tracker',this)">27 Skills</button>
 <button class="tab" data-role="instructor" onclick="showPage('lessons',this)">Lessons</button>
@@ -73,6 +74,21 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}th{back
 </div>
 <div class="cards" id="dashCards"></div>
 <div id="learnerTable"></div>
+</section>
+
+<section id="adminHub" class="page">
+<h2>Admin Operations Hub</h2>
+<div class="notice"><strong>Working model:</strong> Amelia remains the diary source of truth. This hub gives admin a business view of payments, instructor totals, learner balances, calendar change approvals and message history.</div>
+<div class="cards" id="adminCards"></div>
+<div class="admin-tools">
+<div class="card"><h3>Add Payment Record</h3><label>Learner</label><select id="financeLearner"></select><label>Amount</label><input id="financeAmount" type="number" step="0.01" placeholder="80"><label>Status</label><select id="financeStatus"><option>Paid</option><option>Pending</option><option>Failed</option><option>Refunded</option></select><label>Notes</label><input id="financeNotes" placeholder="Stripe / Amelia reference"><button onclick="addFinanceRecord()">Add Finance Record</button></div>
+<div class="card"><h3>Request Calendar Change</h3><label>Learner</label><select id="calendarLearner"></select><label>Current Slot</label><input id="calendarCurrent" placeholder="Current Amelia slot"><label>Requested Slot</label><input id="calendarRequested" placeholder="Requested new slot"><label>Reason</label><input id="calendarReason" placeholder="Reason for change"><button onclick="addCalendarChange()">Add Change Request</button></div>
+<div class="card"><h3>Draft Message</h3><label>To</label><select id="messageTarget"></select><label>Channel</label><select id="messageChannel"><option>Email</option><option>SMS</option><option>WhatsApp</option></select><label>Message</label><textarea id="messageBody" placeholder="Message to learner or instructor"></textarea><button onclick="addMessageLog()">Log Message</button></div>
+</div>
+<h3>Finance Overview</h3><div id="financeTable" class="table-wrap"></div>
+<h3>Instructor Totals</h3><div id="instructorFinanceTable" class="table-wrap"></div>
+<h3>Calendar Change Approvals</h3><div id="calendarChangeTable" class="table-wrap"></div>
+<h3>Message & Notification Log</h3><div id="messageLogTable" class="table-wrap"></div>
 </section>
 
 <section id="details" class="page">
@@ -167,11 +183,23 @@ function seed(){
     }
   }
 }
+function defaultFinanceTransactions(){
+  return [];
+}
+function defaultCalendarChanges(){
+  return [];
+}
+function defaultMessageLog(){
+  return [];
+}
 function migrateState(){
   if(!state.instructors)state.instructors=seed().instructors;
   Object.entries(seed().instructors).forEach(([id,instructor])=>{if(!state.instructors[id])state.instructors[id]=instructor});
   Object.values(state.instructors).forEach(i=>{if(!i.ameliaEmployeeId)i.ameliaEmployeeId=''});
   if(!Array.isArray(state.bookingRequests))state.bookingRequests=[];
+  if(!Array.isArray(state.financeTransactions))state.financeTransactions=defaultFinanceTransactions();
+  if(!Array.isArray(state.calendarChanges))state.calendarChanges=defaultCalendarChanges();
+  if(!Array.isArray(state.messageLog))state.messageLog=defaultMessageLog();
   Object.values(state.learners||{}).forEach((l,i)=>{if(!l.userId)l.userId='U_'+l.id;if(!l.instructorUserId)l.instructorUserId='I1';if(!l.password)l.password=randomPassword();if(!l.email)l.email=(l.name||('learner'+i)).toLowerCase().replaceAll(' ','.')+'@example.com'});
 }
 migrateState();
@@ -254,7 +282,7 @@ function fillDemo(type){
 }
 function applyRoleView(){
   let u=currentUser();
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('hidden',!u||t.dataset.role!==currentRole()));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('hidden',!u||t.dataset.role!==currentRole()||(t.dataset.adminOnly==='true'&&!isAdmin())));
   document.querySelectorAll('.actions button,.actions .btn').forEach(el=>el.classList.toggle('hidden',!isInstructor()));
   let badge=document.getElementById('roleBadge'), learnerBadge=document.getElementById('currentLearnerBadge');
   if(!u){
@@ -267,10 +295,10 @@ function applyRoleView(){
   else if(isAdmin()){badge.textContent='Admin: '+u.name;learnerBadge.textContent='Admin access - '+visibleLearners().length+' learner records';learnerBadge.classList.remove('hidden')}
   else if(isInstructor()){badge.textContent='Instructor: '+u.name;learnerBadge.textContent='Instructor access - '+visibleLearners().length+' learner records';learnerBadge.classList.remove('hidden')}
   else{badge.textContent='Learner: '+u.name;learnerBadge.textContent='Own record only';learnerBadge.classList.remove('hidden')}
-  document.getElementById('authState').value=u?(isInstructor()?'Instructor access':'Learner access'):'Signed out';
+  document.getElementById('authState').value=u?(isAdmin()?'Admin access':isInstructor()?'Instructor access':'Learner access'):'Signed out';
   ensureCurrentLearner();
   let activePage=document.querySelector('.page.active')?.id;
-  if(!activePage)showPage(isInstructor()?'dashboard':'learnerView');
+  if(!activePage)showPage(isInstructor()?(isAdmin()?'adminHub':'dashboard'):'learnerView');
   if(!isInstructor()&&activePage!=='learnerView')showPage('learnerView');
 }
 function readiness(l){let skillScore=l.skills.reduce((a,s)=>a+({not_started:0,introduced:1,helped:2,prompted:3,independent:4,reflection:5}[s.stage]||0),0)/(27*5)*85;let latest=l.mocks[l.mocks.length-1];let mock=0;if(latest){let t=mockTotals(latest);mock=t.s||t.d?0:(t.df<=15?15:8)}return Math.round(Math.min(100,skillScore+mock))}
@@ -365,6 +393,61 @@ async function loadBookings(){
   }catch(_err){}
   renderBookings();
 }
+function money(v){return 'GBP '+Number(v||0).toFixed(2)}
+function statusClass(status){return String(status||'').toLowerCase().replace(/[^a-z0-9]+/g,'-')}
+function learnerOptions(selected){
+  return Object.values(state.learners||{}).map(l=>`<option value="${l.id}" ${selected===l.id?'selected':''}>${l.name} - ${allocatedInstructor(l).name||l.instructor||'Unassigned'}</option>`).join('');
+}
+function messageTargetOptions(){
+  let learnerRows=Object.values(state.learners||{}).map(l=>`<option value="learner:${l.id}">Learner - ${l.name}</option>`);
+  let instructorRows=Object.values(state.instructors||{}).filter(i=>i.role!=='admin').map(i=>`<option value="instructor:${i.id}">Instructor - ${i.name}</option>`);
+  return learnerRows.concat(instructorRows).join('');
+}
+function renderAdminHub(){
+  if(!isAdmin())return;
+  let tx=state.financeTransactions||[], learners=Object.values(state.learners||{}), changes=state.calendarChanges||[], messages=state.messageLog||[];
+  let paid=tx.filter(t=>String(t.status).toLowerCase()==='paid').reduce((a,t)=>a+Number(t.amount||0),0);
+  let pending=tx.filter(t=>String(t.status).toLowerCase()==='pending').reduce((a,t)=>a+Number(t.amount||0),0);
+  let openChanges=changes.filter(c=>String(c.status).toLowerCase()==='pending').length;
+  document.getElementById('adminCards').innerHTML=`<div class="card">Paid Revenue<br><strong>${money(paid)}</strong></div><div class="card">Pending Payments<br><strong>${money(pending)}</strong></div><div class="card">Calendar Approvals<br><strong>${openChanges}</strong></div><div class="card">Learners / Instructors<br><strong>${learners.length} / ${Object.values(state.instructors||{}).filter(i=>i.role!=='admin').length}</strong></div>`;
+  ['financeLearner','calendarLearner'].forEach(id=>{let el=document.getElementById(id);if(el)el.innerHTML=learnerOptions(el.value)});
+  let target=document.getElementById('messageTarget');if(target)target.innerHTML=messageTargetOptions();
+  document.getElementById('financeTable').innerHTML='<table><thead><tr><th>Date</th><th>Learner</th><th>Instructor</th><th>Service</th><th>Amount</th><th>Status</th><th>Source</th><th>Notes</th></tr></thead><tbody>'+tx.map(t=>`<tr><td>${t.date||''}</td><td>${t.learnerName||'-'}</td><td>${t.instructor||'-'}</td><td>${t.service||'Lesson'}</td><td><strong>${money(t.amount)}</strong></td><td><span class="status-pill ${statusClass(t.status)}">${t.status||'New'}</span></td><td>${t.source||'Manual'}</td><td>${t.notes||''}</td></tr>`).join('')+'</tbody></table>';
+  let byInstructor={};
+  Object.values(state.instructors||{}).filter(i=>i.role!=='admin').forEach(i=>byInstructor[i.id]={name:i.name,learners:learners.filter(l=>l.instructorUserId===i.id).length,paid:0,pending:0});
+  tx.forEach(t=>{let key=t.instructorId||Object.values(state.instructors||{}).find(i=>i.name===t.instructor)?.id;if(!key)return;if(!byInstructor[key])byInstructor[key]={name:t.instructor||key,learners:0,paid:0,pending:0};if(String(t.status).toLowerCase()==='paid')byInstructor[key].paid+=Number(t.amount||0);if(String(t.status).toLowerCase()==='pending')byInstructor[key].pending+=Number(t.amount||0)});
+  document.getElementById('instructorFinanceTable').innerHTML='<table><thead><tr><th>Instructor</th><th>Learners</th><th>Paid Revenue</th><th>Pending</th><th>Amelia Employee ID</th></tr></thead><tbody>'+Object.entries(byInstructor).map(([id,row])=>`<tr><td><strong>${row.name}</strong></td><td>${row.learners}</td><td>${money(row.paid)}</td><td>${money(row.pending)}</td><td>${state.instructors[id]?.ameliaEmployeeId||'-'}</td></tr>`).join('')+'</tbody></table>';
+  document.getElementById('calendarChangeTable').innerHTML='<table><thead><tr><th>Created</th><th>Learner</th><th>Instructor</th><th>Current Slot</th><th>Requested Slot</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead><tbody>'+changes.map(c=>`<tr><td>${new Date(c.createdAt||Date.now()).toLocaleDateString('en-GB')}</td><td>${c.learnerName||'-'}</td><td>${c.instructor||'-'}</td><td>${c.currentSlot||'-'}</td><td>${c.requestedSlot||'-'}</td><td>${c.reason||''}</td><td><span class="status-pill ${statusClass(c.status)}">${c.status||'Pending'}</span></td><td>${String(c.status).toLowerCase()==='pending'?`<button onclick="setCalendarChangeStatus('${c.id}','Approved')">Approve</button> <button class="red" onclick="setCalendarChangeStatus('${c.id}','Rejected')">Reject</button>`:'Logged'}</td></tr>`).join('')+'</tbody></table>';
+  document.getElementById('messageLogTable').innerHTML='<table><thead><tr><th>Date</th><th>To</th><th>Role</th><th>Channel</th><th>Status</th><th>Message</th></tr></thead><tbody>'+messages.map(m=>`<tr><td>${new Date(m.createdAt||Date.now()).toLocaleString('en-GB')}</td><td>${m.to||'-'}</td><td>${m.role||'-'}</td><td>${m.channel||'Email'}</td><td><span class="status-pill ${statusClass(m.status)}">${m.status||'Drafted'}</span></td><td>${m.message||''}</td></tr>`).join('')+'</tbody></table>';
+}
+function addFinanceRecord(){
+  if(!isAdmin())return;
+  let learner=state.learners[document.getElementById('financeLearner').value];if(!learner)return;
+  let instructor=allocatedInstructor(learner), amount=Number(document.getElementById('financeAmount').value||0);
+  state.financeTransactions.unshift({id:'FT'+Date.now(),date:new Date().toISOString().slice(0,10),learnerId:learner.id,learnerName:learner.name,instructorId:instructor.id||learner.instructorUserId,instructor:instructor.name||learner.instructor,service:'Lesson payment',amount,status:document.getElementById('financeStatus').value,source:'Manual admin entry',notes:document.getElementById('financeNotes').value});
+  document.getElementById('financeAmount').value='';document.getElementById('financeNotes').value='';save();
+}
+function addCalendarChange(){
+  if(!isAdmin())return;
+  let learner=state.learners[document.getElementById('calendarLearner').value];if(!learner)return;
+  let instructor=allocatedInstructor(learner);
+  state.calendarChanges.unshift({id:'CC'+Date.now(),createdAt:new Date().toISOString(),learnerId:learner.id,learnerName:learner.name,instructorId:instructor.id||learner.instructorUserId,instructor:instructor.name||learner.instructor,currentSlot:document.getElementById('calendarCurrent').value,requestedSlot:document.getElementById('calendarRequested').value,reason:document.getElementById('calendarReason').value,status:'Pending'});
+  ['calendarCurrent','calendarRequested','calendarReason'].forEach(id=>document.getElementById(id).value='');save();
+}
+function setCalendarChangeStatus(id,status){
+  if(!isAdmin())return;
+  let item=(state.calendarChanges||[]).find(c=>c.id===id);if(!item)return;
+  item.status=status;item.reviewedAt=new Date().toISOString();item.reviewedBy=currentUser()?.name||'Admin';
+  state.messageLog.unshift({id:'MSG'+Date.now(),createdAt:new Date().toISOString(),to:item.learnerName,role:'Learner',channel:'Email',message:`Calendar change ${status.toLowerCase()}: ${item.requestedSlot}. Admin should now update Amelia if required.`,status:'Drafted'});
+  save();
+}
+function addMessageLog(){
+  if(!isAdmin())return;
+  let raw=document.getElementById('messageTarget').value, [role,id]=raw.split(':'), person=role==='learner'?state.learners[id]:state.instructors[id];
+  let body=document.getElementById('messageBody').value.trim();if(!person||!body)return;
+  state.messageLog.unshift({id:'MSG'+Date.now(),createdAt:new Date().toISOString(),to:person.name,role:role==='learner'?'Learner':'Instructor',channel:document.getElementById('messageChannel').value,message:body,status:'Drafted'});
+  document.getElementById('messageBody').value='';save();
+}
 function renderLearnerView(){let learner=L(), instructor=allocatedInstructor(learner), approved=isLearnerApproved(learner);document.getElementById('learnerCards').innerHTML=`<div class="card">Current Readiness<br><strong>${readiness(learner)}%</strong></div><div class="card">Private Practice<br><strong>${learner.practices.length}</strong></div><div class="card">Lessons<br><strong>${learner.lessons.length}</strong></div><div class="card">Mocks<br><strong>${learner.mocks.length}</strong></div>`;document.getElementById('learnerBookingPanel').innerHTML=approved?`<h3>Book a Lesson</h3><p class="small">This private link opens ${instructor.name||'your allocated instructor'}'s Amelia diary directly. Choose an available slot there; payment confirms the lesson.</p><div class="actions" style="margin-left:0"><button onclick="openAmeliaBooking()">Open Instructor Diary</button></div>`:`<h3>Book a Lesson</h3><p class="small">Your private booking link will appear here once your instructor approves your learner account.</p>`;document.getElementById('learnerLockedProgress').innerHTML=document.getElementById('trackerTable').innerHTML}
 function learnerAddPractice(){let note=document.getElementById('learnerPracticeNote').value;if(note){L().practices.push({date:new Date().toLocaleDateString('en-GB'),supervisor:'Learner entry',notes:note});document.getElementById('learnerPracticeNote').value='';save()}}
 function learnerAddReflection(){let note=document.getElementById('learnerReflectionNote').value;if(note){if(!L().lessons.length)L().lessons.push({date:new Date().toLocaleDateString('en-GB')});L().lessons[L().lessons.length-1].reflection=note;document.getElementById('learnerReflectionNote').value='';save()}}
@@ -376,14 +459,14 @@ function toggleMark(key,type){let marks=L().mocks[openMockIndex].marks;if(marks[
 function exportData(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));a.download='allison-driver-academy-master-data.json';a.click()}
 function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{state=JSON.parse(r.result);currentId=state.currentId;save()};r.readAsText(f)}
 function resetDemo(){if(confirm('Reset demo data?')){localStorage.removeItem('ada_complete_master_demo');state=seed();currentId=state.currentId;save()}}
-function renderAll(){applyRoleView();if(!currentUser())return;renderLearners();renderDetails();renderTracker();renderLessons();renderPractice();renderMocks();renderReady();renderBookings();renderLearnerView()}
+function renderAll(){applyRoleView();if(!currentUser())return;renderLearners();renderAdminHub();renderDetails();renderTracker();renderLessons();renderPractice();renderMocks();renderReady();renderBookings();renderLearnerView()}
 renderAll();
 if(privateBookingRequested&&!currentUser())setSyncStatus('Sign in with your learner login to access the private booking link.');
 
 function setSyncStatus(message){
   let status=document.getElementById('syncStatus'), authState=document.getElementById('authState');
   if(status)status.textContent=message;
-  if(authState)authState.value=currentUser() ? (isInstructor()?'Instructor access':'Learner access') : 'Signed out';
+  if(authState)authState.value=currentUser() ? (isAdmin()?'Admin access':isInstructor()?'Instructor access':'Learner access') : 'Signed out';
 }
 async function initSupabase(){
   try{
@@ -411,7 +494,7 @@ async function signIn(){
     localStorage.setItem('ada_active_user_id',activeUserId);
     ensureCurrentLearner();
     setSyncStatus((isInstructor()?'Instructor':'Learner')+' login active.');
-    showPage(isInstructor()?'dashboard':'learnerView');
+    showPage(isInstructor()?(isAdmin()?'adminHub':'dashboard'):'learnerView');
     if(privateBookingRequested&&!isInstructor())setSyncStatus('Private approved learner booking link ready.');
     save();
     return;
