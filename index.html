@@ -166,6 +166,7 @@ let state=JSON.parse(localStorage.getItem('ada_complete_master_demo')||'null')||
 const privateBookingRequested=new URLSearchParams(window.location.search).get('approvedBooking')==='1';
 let activeUserId='', currentId=state.currentId, openMockIndex=null, supabaseClient=null, supabaseSession=null, saveTimer=null, isCloudLoading=false;
 let appConfig={ameliaBookingUrl:'https://allisondriveracademy.com/enquiry/',approvedLearnerBookingUrl:'https://allisondriveracademy.com/enquiry/',paymentRedirectUrl:'/api/payment-link'};
+function isAdminEmail(email){return ['admin@allisondriveracademy.co.uk','admin@allisondriveracademy.com'].includes((email||'').trim().toLowerCase())}
 function makeLearner(id,name,email,password,instructorUserId,extras={}){
   return Object.assign({id,userId:id+'U',instructorUserId,name,instructor:state?.instructors?.[instructorUserId]?.name||'Dave Allison',start:new Date().toLocaleDateString('en-GB'),target:'',testCentre:'',vehicle:'Manual',phone:'',email,password,status:'Open',skills:skills.map(()=>({stage:'not_started',notes:''})),lessons:[],practices:[],mocks:[],finalNotes:''},extras);
 }
@@ -196,6 +197,12 @@ function migrateState(){
   if(!state.instructors)state.instructors=seed().instructors;
   Object.entries(seed().instructors).forEach(([id,instructor])=>{if(!state.instructors[id])state.instructors[id]=instructor});
   Object.values(state.instructors).forEach(i=>{if(!i.ameliaEmployeeId)i.ameliaEmployeeId=''});
+  state.instructors.I2=Object.assign({id:'I2',name:'Admin',email:'admin@allisondriveracademy.co.uk',password:'Admin123!',ameliaEmployeeId:''},state.instructors.I2||{});
+  state.instructors.I2.name='Admin';
+  state.instructors.I2.email=state.instructors.I2.email||'admin@allisondriveracademy.co.uk';
+  state.instructors.I2.password=state.instructors.I2.password||'Admin123!';
+  state.instructors.I2.role='admin';
+  Object.values(state.instructors).forEach(i=>{if(isAdminEmail(i.email))i.role='admin'});
   if(!Array.isArray(state.bookingRequests))state.bookingRequests=[];
   if(!Array.isArray(state.financeTransactions))state.financeTransactions=defaultFinanceTransactions();
   if(!Array.isArray(state.calendarChanges))state.calendarChanges=defaultCalendarChanges();
@@ -213,7 +220,10 @@ function userIdForEmail(email){
   if(instructor)return instructor.id;
   let learner=Object.values(state.learners||{}).find(l=>(l.email||'').trim().toLowerCase()===email);
   if(learner)return learner.userId;
-  if(email==='admin@allisondriveracademy.com'){
+  if(isAdminEmail(email)){
+    state.instructors.I2=Object.assign({id:'I2',name:'Admin',email,password:'Admin123!',role:'admin',ameliaEmployeeId:''},state.instructors.I2||{});
+    state.instructors.I2.email=email;
+    state.instructors.I2.role='admin';
     let admin=Object.values(state.instructors||{}).find(u=>u.role==='admin');
     if(admin)return admin.id;
   }
@@ -233,7 +243,7 @@ function ensurePortalProfileForEmail(email){
   let existing=userIdForEmail(email);
   if(existing)return existing;
   state.instructors=state.instructors||{};
-  if(email==='admin@allisondriveracademy.com'){
+  if(isAdminEmail(email)){
     state.instructors.I2=Object.assign({id:'I2',name:'Admin',password:'',ameliaEmployeeId:''},state.instructors.I2||{});
     state.instructors.I2.email=email;
     state.instructors.I2.role='admin';
@@ -259,7 +269,7 @@ function resolveSignedInUserId(){
   setSyncStatus('Signed in, but no learner or instructor profile matched '+email+'. Ask admin to add this email to a portal profile.');
   return '';
 }
-function rawRole(){let u=currentUser();return u?.role||'learner'}
+function rawRole(){let u=currentUser();return isAdminEmail(u?.email)?'admin':(u?.role||'learner')}
 function currentRole(){return rawRole()==='admin'?'instructor':rawRole()}
 function isAdmin(){return rawRole()==='admin'}
 function isInstructor(){return ['instructor','admin'].includes(rawRole())}
@@ -272,7 +282,7 @@ document.querySelectorAll('[data-field]').forEach(el=>el.addEventListener('input
 function randomPassword(){return 'ADA-'+Math.random().toString(36).slice(2,8).toUpperCase()+'!'}
 function loginUser(email,password){
   let instructor=Object.values(state.instructors).find(u=>u.email.toLowerCase()===email.toLowerCase()&&u.password===password);
-  if(instructor)return instructor.id;
+  if(instructor){if(isAdminEmail(instructor.email))instructor.role='admin';return instructor.id}
   let learner=Object.values(state.learners).find(l=>l.email.toLowerCase()===email.toLowerCase()&&l.password===password);
   return learner?learner.userId:'';
 }
