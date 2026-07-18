@@ -5,26 +5,26 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Allison Driver Academy Learner Progress Sheet</title>
 <style>
-:root{--navy:#003B71;--red:#D71920;--grey:#333333;--line:#d8e0ea;--light:#f5f7fa;--green:#1f8f4d;--amber:#d99600;}
-*{box-sizing:border-box} body{font-family:Arial,Helvetica,sans-serif;margin:0;background:#eef2f6;color:#20242a}
-.app{max-width:1200px;margin:auto;padding:18px}.header{background:white;border-radius:16px;padding:18px;display:flex;gap:24px;align-items:center;box-shadow:0 4px 18px rgba(0,0,0,.08);border-top:6px solid var(--navy)}
-.logo{width:260px;max-width:45%} h1{margin:0;color:var(--navy);font-size:28px} h2,h3{color:var(--navy)} .tag{color:var(--red);font-weight:700}
-.actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}button,.btn{background:var(--navy);color:white;border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;text-decoration:none}button.red{background:var(--red)}button.white{background:white;color:var(--navy);border:1px solid var(--line)}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.tab{background:white;color:var(--navy);border:1px solid var(--line)}.tab.active{background:var(--navy);color:white}
-.page{display:none;background:white;border-radius:16px;padding:18px;box-shadow:0 4px 18px rgba(0,0,0,.08);margin-bottom:18px}.page.active{display:block}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}.card{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--light)}.card strong{color:var(--navy);font-size:22px}.admin-tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0}.status-pill{display:inline-block;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:800;background:#e8eef6;color:var(--navy)}.status-pill.paid,.status-pill.approved{background:#dff5e8;color:#126438}.status-pill.pending{background:#fff3cf;color:#7a5500}.status-pill.rejected,.status-pill.failed{background:#fde1e2;color:#9c1116}.table-wrap{overflow-x:auto}
-label{font-size:12px;font-weight:700;color:var(--navy)}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;margin-top:4px}textarea{min-height:72px}
-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}th{background:var(--navy);color:white;padding:8px;text-align:left}td{border:1px solid var(--line);padding:7px;vertical-align:top}.group td{background:var(--navy);color:white;font-weight:700}
-.progress{height:20px;background:#dce4ec;border-radius:99px;overflow:hidden}.bar{height:100%;background:var(--navy);border-radius:99px}.bar.green{background:var(--green)}.bar.amber{background:var(--amber)}
-.pill{display:inline-block;border-radius:99px;padding:4px 8px;font-size:12px;font-weight:700}.pass{background:#dff5e8;color:#126438}.fail{background:#fde1e2;color:#9c1116}.locked{opacity:.65}.notice{border-left:5px solid var(--red);background:#fff5f5;padding:12px;border-radius:10px;margin:12px 0}
-.lesson{border:1px solid var(--line);border-radius:14px;padding:14px;margin:12px 0;background:#fff}.small{font-size:12px;color:#596575}.right{text-align:right}.hidden{display:none!important}
-.dl25-scroll{width:100%;overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;border:1px solid #111;background:white}.dl25{border:2px solid #111;background:#fff;color:#111;font-size:12px;min-width:940px;width:max-content}.dl25-head{display:grid;grid-template-columns:320px 130px 180px 110px;border-bottom:2px solid #111}.dl25-head div{padding:8px;border-right:1px solid #111}.dl25-title{font-weight:800;font-size:18px}.dl25-row{display:grid;grid-template-columns:36px 230px repeat(16,34px) 44px 44px;border-bottom:1px solid #111}.dl25-row div{border-right:1px solid #111;min-height:34px;padding:5px;text-align:center;background:white}.dl25-row>div:nth-child(1),.dl25-row>div:nth-child(2){position:sticky;z-index:2}.dl25-row>div:nth-child(1){left:0}.dl25-row>div:nth-child(2){left:36px}.dl25-row .area{text-align:left;font-weight:700}.dl25-row .no{font-weight:700}.fault-cell{cursor:pointer;background:#fff}.fault-cell:hover{background:#edf4ff}.fault-cell.marked{background:#003B71;color:white;font-weight:900}.fault-cell.serious{background:#f7d7d9;color:#900}.fault-cell.danger{background:#d71920;color:white}.dl25-sub{font-weight:800}.dl25-sub div{background:#e8eef6}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:14px;z-index:5}.modal .box{background:white;max-width:980px;width:100%;max-height:90vh;overflow:auto;border-radius:16px;padding:18px}.modal .actions{position:sticky;top:0;z-index:4;background:white;padding-bottom:8px}
-.auth-panel{background:white;border-radius:16px;padding:14px 18px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;box-shadow:0 4px 18px rgba(0,0,0,.08);margin:16px 0;border-left:5px solid var(--navy)}
-.auth-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.auth-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.sync-status{font-size:12px;color:#596575;font-weight:700;margin-top:8px}
-.role-strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.role-badge{background:#e8eef6;color:var(--navy);border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800}.credential-card{background:#f8fafc;border:1px dashed var(--line);border-radius:12px;padding:10px;margin-top:10px}.credential-card code{font-weight:800;color:var(--navy)}
-.footer{text-align:center;color:var(--navy);font-weight:700;font-size:12px;margin:20px}
-@media(max-width:760px){.header{display:block}.logo{max-width:100%;width:240px}.actions{margin-top:12px}.grid,.cards,.admin-tools,.auth-panel,.auth-fields{grid-template-columns:1fr}.auth-actions{justify-content:flex-start}.modal{align-items:stretch;padding:0}.modal .box{max-height:100vh;border-radius:0;padding:10px}.dl25-scroll{max-width:100%;border-radius:8px}.dl25{font-size:11px;min-width:890px}.dl25-head{grid-template-columns:280px 120px 160px 100px}.dl25-title{font-size:15px}.dl25-row{grid-template-columns:34px 200px repeat(16,32px) 40px 40px}.dl25-row>div:nth-child(2){left:34px}.dl25-row div{min-height:36px;padding:5px 4px}.dl25-row .area{white-space:normal;line-height:1.15}table{font-size:11px}}
+:root{--navy:#172321;--red:#9d563e;--grey:#172321;--line:#172321;--light:#f8f5ea;--green:#2f6280;--amber:#d5bc62;--cream:#f8f5ea;--yellow:#d5bc62;--sage:#b9c5a4;--clay:#9d563e;--blue:#2f6280;--ink:#172321;--shadow:7px 7px 0 var(--ink);}
+*{box-sizing:border-box} body{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;background:linear-gradient(135deg,rgba(23,35,33,.08) 0 25%,transparent 25% 50%,rgba(23,35,33,.06) 50% 75%,transparent 75%),var(--cream);color:var(--ink)}
+.app{max-width:1280px;margin:auto;padding:18px}.header{background:var(--cream);border:3px solid var(--ink);padding:18px;display:flex;gap:24px;align-items:center;box-shadow:var(--shadow)}
+.logo{width:260px;max-width:45%;background:var(--cream);border:3px solid var(--ink);padding:8px} h1{margin:0;color:var(--ink);font-size:clamp(30px,5vw,56px);line-height:.88;letter-spacing:-.06em;text-transform:uppercase} h2,h3{color:var(--ink);letter-spacing:-.035em;text-transform:uppercase} h2{font-size:clamp(28px,4vw,44px);line-height:.9}.tag{color:var(--clay);font-weight:950;text-transform:uppercase;letter-spacing:.08em}
+.actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}button,.btn{background:var(--yellow);color:var(--ink);border:3px solid var(--ink);border-radius:0;padding:10px 14px;font-weight:950;cursor:pointer;text-decoration:none;text-transform:uppercase;letter-spacing:.04em;box-shadow:4px 4px 0 var(--ink)}button:hover,.btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}button.red{background:var(--clay);color:var(--cream)}button.white{background:var(--cream);color:var(--ink);border:3px solid var(--ink)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tab{background:var(--cream);color:var(--ink);border:3px solid var(--ink)}.tab.active{background:var(--ink);color:var(--cream)}
+.page{display:none;background:var(--cream);border:3px solid var(--ink);border-radius:0;padding:20px;box-shadow:var(--shadow);margin-bottom:20px}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.card{border:3px solid var(--ink);border-radius:0;padding:16px;background:var(--cream);box-shadow:5px 5px 0 var(--ink)}.card:nth-child(3n+2){background:var(--sage)}.card:nth-child(3n+3){background:var(--yellow)}.card strong{color:var(--ink);font-size:26px;letter-spacing:-.04em}.admin-tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:16px 0}.status-pill{display:inline-block;border:2px solid currentColor;border-radius:0;padding:5px 8px;font-size:12px;font-weight:950;background:var(--cream);color:var(--ink);text-transform:uppercase}.status-pill.paid,.status-pill.approved{background:var(--sage);color:var(--ink)}.status-pill.pending{background:var(--yellow);color:var(--ink)}.status-pill.rejected,.status-pill.failed{background:var(--clay);color:var(--cream)}.table-wrap{overflow-x:auto;border:3px solid var(--ink);background:var(--cream)}
+label{font-size:12px;font-weight:950;color:var(--ink);text-transform:uppercase;letter-spacing:.07em}input,select,textarea{width:100%;border:3px solid var(--ink);border-radius:0;padding:11px;font:inherit;margin-top:5px;background:var(--cream);color:var(--ink)}textarea{min-height:76px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px;background:var(--cream)}th{background:var(--ink);color:var(--cream);padding:9px;text-align:left;text-transform:uppercase;letter-spacing:.04em}td{border:2px solid var(--ink);padding:8px;vertical-align:top}.group td{background:var(--ink);color:var(--cream);font-weight:950;text-transform:uppercase}
+.progress{height:22px;background:var(--cream);border:3px solid var(--ink);border-radius:0;overflow:hidden}.bar{height:100%;background:var(--blue);border-radius:0}.bar.green{background:var(--sage)}.bar.amber{background:var(--yellow)}
+.pill{display:inline-block;border:2px solid currentColor;border-radius:0;padding:4px 8px;font-size:12px;font-weight:950;text-transform:uppercase}.pass{background:var(--sage);color:var(--ink)}.fail{background:var(--clay);color:var(--cream)}.locked{opacity:.7}.notice{border:3px solid var(--ink);background:var(--yellow);padding:14px;margin:14px 0;box-shadow:5px 5px 0 var(--ink)}
+.lesson{border:3px solid var(--ink);padding:16px;margin:14px 0;background:var(--cream);box-shadow:5px 5px 0 var(--ink)}.small{font-size:12px;color:var(--ink);font-weight:800}.right{text-align:right}.hidden{display:none!important}
+.dl25-scroll{width:100%;overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;border:3px solid var(--ink);background:var(--cream);box-shadow:5px 5px 0 var(--ink)}.dl25{border:3px solid var(--ink);background:var(--cream);color:var(--ink);font-size:12px;min-width:940px;width:max-content}.dl25-head{display:grid;grid-template-columns:320px 130px 180px 110px;border-bottom:3px solid var(--ink);background:var(--yellow)}.dl25-head div{padding:8px;border-right:2px solid var(--ink)}.dl25-title{font-weight:950;font-size:18px;text-transform:uppercase}.dl25-row{display:grid;grid-template-columns:36px 230px repeat(16,34px) 44px 44px;border-bottom:2px solid var(--ink)}.dl25-row div{border-right:2px solid var(--ink);min-height:34px;padding:5px;text-align:center;background:var(--cream)}.dl25-row>div:nth-child(1),.dl25-row>div:nth-child(2){position:sticky;z-index:2;background:var(--cream)}.dl25-row>div:nth-child(1){left:0}.dl25-row>div:nth-child(2){left:36px}.dl25-row .area{text-align:left;font-weight:950}.dl25-row .no{font-weight:950}.fault-cell{cursor:pointer;background:var(--cream)}.fault-cell:hover{background:var(--sage)}.fault-cell.marked{background:var(--blue);color:var(--cream);font-weight:950}.fault-cell.serious{background:var(--yellow);color:var(--ink)}.fault-cell.danger{background:var(--clay);color:var(--cream)}.dl25-sub{font-weight:950}.dl25-sub div{background:var(--sage)}
+.modal{position:fixed;inset:0;background:rgba(23,35,33,.78);display:none;align-items:center;justify-content:center;padding:14px;z-index:5}.modal .box{background:var(--cream);max-width:980px;width:100%;max-height:90vh;overflow:auto;border:3px solid var(--ink);border-radius:0;padding:18px;box-shadow:var(--shadow)}.modal .actions{position:sticky;top:0;z-index:4;background:var(--cream);padding-bottom:8px}
+.auth-panel{background:var(--sage);border:3px solid var(--ink);border-radius:0;padding:16px 18px;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end;box-shadow:var(--shadow);margin:18px 0}
+.auth-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.auth-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.sync-status{font-size:12px;color:var(--ink);font-weight:900;margin-top:8px}
+.role-strip{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.role-badge{background:var(--cream);color:var(--ink);border:2px solid var(--ink);border-radius:0;padding:6px 10px;font-size:12px;font-weight:950;text-transform:uppercase}.credential-card{background:var(--yellow);border:3px dashed var(--ink);border-radius:0;padding:12px;margin-top:10px}.credential-card code{font-weight:950;color:var(--ink)}
+.footer{text-align:center;color:var(--ink);font-weight:950;font-size:12px;margin:22px;text-transform:uppercase;letter-spacing:.07em}
+@media(max-width:760px){.header{display:block}.logo{max-width:100%;width:240px}.actions{margin-top:12px}.grid,.cards,.admin-tools,.auth-panel,.auth-fields{grid-template-columns:1fr}.auth-actions{justify-content:flex-start}.modal{align-items:stretch;padding:0}.modal .box{max-height:100vh;border-radius:0;padding:10px}.dl25-scroll{max-width:100%}.dl25{font-size:11px;min-width:890px}.dl25-head{grid-template-columns:280px 120px 160px 100px}.dl25-title{font-size:15px}.dl25-row{grid-template-columns:34px 200px repeat(16,32px) 40px 40px}.dl25-row>div:nth-child(2){left:34px}.dl25-row div{min-height:36px;padding:5px 4px}.dl25-row .area{white-space:normal;line-height:1.15}table{font-size:11px}}
 @media print{body{background:white}.tabs,.actions,button,.no-print,.modal{display:none!important}.page{display:block;box-shadow:none;page-break-after:always;border-radius:0}.app{max-width:none;padding:0}.header{box-shadow:none}}
 </style>
 </head>
@@ -164,7 +164,7 @@ const stages=['not_started','introduced','helped','prompted','independent','refl
 const dl25Areas=['Eyesight / safety questions','Move off - safety','Move off - control','Control - steering','Control - gears','Control - footbrake','Control - clutch','Mirrors - signal','Mirrors - change direction','Mirrors - change speed','Signals - necessary','Signals - correctly','Junctions - approach speed','Junctions - observation','Junctions - turning right','Junctions - turning left','Roundabouts','Progress - speed','Progress - undue hesitation','Positioning - normal driving','Positioning - lane discipline','Clearance / obstructions','Response to signs / signals','Planning / awareness','Meeting / crossing traffic','Manoeuvre','Emergency stop','Independent driving'];
 let state=JSON.parse(localStorage.getItem('ada_complete_master_demo')||'null')||seed();
 const privateBookingRequested=new URLSearchParams(window.location.search).get('approvedBooking')==='1';
-let activeUserId='', currentId=state.currentId, openMockIndex=null, supabaseClient=null, supabaseSession=null, saveTimer=null, isCloudLoading=false;
+let activeUserId='', currentId=state.currentId, openMockIndex=null, supabaseClient=null, supabaseSession=null, saveTimer=null, sharedSaveTimer=null, isCloudLoading=false;
 let appConfig={ameliaBookingUrl:'https://allisondriveracademy.com/enquiry/',approvedLearnerBookingUrl:'https://allisondriveracademy.com/enquiry/',paymentRedirectUrl:'/api/payment-link'};
 function isAdminEmail(email){return ['admin@allisondriveracademy.co.uk','admin@allisondriveracademy.com'].includes((email||'').trim().toLowerCase())}
 function makeLearner(id,name,email,password,instructorUserId,extras={}){
@@ -211,6 +211,103 @@ function migrateState(){
 }
 migrateState();
 if(!state.instructors[activeUserId]&&!Object.values(state.learners).some(l=>l.userId===activeUserId))activeUserId='';
+function cleanEmail(email){return (email||'').trim().toLowerCase()}
+function cloneData(value){return JSON.parse(JSON.stringify(value||{}))}
+function instructorIdForEmail(email,name){
+  email=cleanEmail(email);
+  if(!email)return '';
+  let existing=Object.values(state.instructors||{}).find(i=>cleanEmail(i.email)===email);
+  if(existing)return existing.id;
+  let id=email.includes('dave')?'I1':'I_'+email.replace(/[^a-z0-9]/g,'_');
+  state.instructors=state.instructors||{};
+  state.instructors[id]=Object.assign({id,name:name||email.split('@')[0],email,password:'',role:'instructor',ameliaEmployeeId:''},state.instructors[id]||{});
+  state.instructors[id].email=email;
+  state.instructors[id].name=name||state.instructors[id].name||email.split('@')[0];
+  state.instructors[id].role=state.instructors[id].role||'instructor';
+  return id;
+}
+function learnerFromSharedRecord(row){
+  let data=cloneData(row.data);
+  let id=data.id||row.portalLearnerId||row.portal_learner_id||row.id;
+  let instructorEmail=cleanEmail(row.instructorEmail||row.instructor_email||data.instructorEmail);
+  let instructorUserId=data.instructorUserId||instructorIdForEmail(instructorEmail,row.instructorName||row.instructor_name||data.instructor);
+  let instructor=state.instructors?.[instructorUserId]||{};
+  return Object.assign(makeLearner(id,row.learnerName||row.learner_name||data.name||'Learner',row.learnerEmail||row.learner_email||data.email||'',row.temporaryPassword||row.temporary_password||data.password||'',instructorUserId),data,{
+    id,
+    userId:data.userId||row.learnerUserId||row.learner_user_id||('U_'+id),
+    instructorUserId,
+    instructor:instructor.name||row.instructorName||row.instructor_name||data.instructor||'',
+    instructorEmail,
+    name:row.learnerName||row.learner_name||data.name||'Learner',
+    email:row.learnerEmail||row.learner_email||data.email||'',
+    password:row.temporaryPassword||row.temporary_password||data.password||'',
+    status:row.status||data.status||'Open'
+  });
+}
+function sharedRecordFromLearner(learner){
+  let instructor=allocatedInstructor(learner);
+  let data=cloneData(learner);
+  data.instructorEmail=cleanEmail(instructor.email||learner.instructorEmail);
+  data.instructor=instructor.name||learner.instructor;
+  data.instructorUserId=instructor.id||learner.instructorUserId;
+  return {
+    portalLearnerId:learner.id,
+    learnerName:learner.name,
+    learnerEmail:learner.email,
+    temporaryPassword:learner.password,
+    instructorEmail:data.instructorEmail,
+    instructorName:data.instructor,
+    status:learner.status||'Open',
+    data
+  };
+}
+function authHeaders(){
+  return supabaseSession?.access_token?{Authorization:'Bearer '+supabaseSession.access_token,'Content-Type':'application/json'}:{'Content-Type':'application/json'};
+}
+function replaceLearnersFromSharedRecords(records){
+  if(!Array.isArray(records)||!records.length)return false;
+  let next={};
+  records.forEach(row=>{let learner=learnerFromSharedRecord(row);if(learner.id)next[learner.id]=learner});
+  if(!Object.keys(next).length)return false;
+  state.learners=next;
+  if(!state.learners[currentId])currentId=Object.keys(state.learners)[0];
+  state.currentId=currentId;
+  return true;
+}
+async function loadSharedLearnerRecords(){
+  if(!supabaseSession?.access_token)return false;
+  try{
+    let res=await fetch('/api/learner-records',{headers:authHeaders()});
+    let data=await res.json();
+    if(!res.ok)throw new Error(data.error||'Unable to load shared learner records.');
+    let changed=replaceLearnersFromSharedRecords(data.records||[]);
+    if(changed)localStorage.setItem('ada_complete_master_demo',JSON.stringify(state));
+    return changed;
+  }catch(err){
+    setSyncStatus('Shared learner sync failed: '+err.message);
+    return false;
+  }
+}
+function queueSharedLearnerSave(){
+  if(!supabaseSession?.access_token||isCloudLoading)return;
+  clearTimeout(sharedSaveTimer);
+  sharedSaveTimer=setTimeout(saveSharedLearnerRecords,900);
+}
+async function saveSharedLearnerRecords(){
+  if(!supabaseSession?.access_token)return;
+  let learners=visibleLearners().map(sharedRecordFromLearner);
+  if(!learners.length)return;
+  try{
+    let res=await fetch('/api/learner-records',{method:'POST',headers:authHeaders(),body:JSON.stringify({records:learners})});
+    let data=await res.json();
+    if(!res.ok)throw new Error(data.error||'Unable to save shared learner records.');
+    if(data.records?.length)replaceLearnersFromSharedRecords(data.records);
+    localStorage.setItem('ada_complete_master_demo',JSON.stringify(state));
+    setSyncStatus('Shared learner records saved at '+new Date().toLocaleTimeString());
+  }catch(err){
+    setSyncStatus('Shared learner save failed: '+err.message);
+  }
+}
 function currentUser(){if(!activeUserId)return null;return state.instructors?.[activeUserId]||Object.values(state.learners).find(l=>l.userId===activeUserId)||null}
 function validUserId(userId){return !!(userId&&(state.instructors?.[userId]||Object.values(state.learners||{}).some(l=>l.userId===userId)))}
 function userIdForEmail(email){
@@ -275,7 +372,7 @@ function isAdmin(){return rawRole()==='admin'}
 function isInstructor(){return ['instructor','admin'].includes(rawRole())}
 function visibleLearners(){return isAdmin()?Object.values(state.learners):isInstructor()?Object.values(state.learners).filter(l=>l.instructorUserId===activeUserId):Object.values(state.learners).filter(l=>l.userId===activeUserId)}
 function ensureCurrentLearner(){let rows=visibleLearners();if(!rows.length)return;if(!state.learners[currentId]||(!isInstructor()&&state.learners[currentId].userId!==activeUserId)||(isInstructor()&&state.learners[currentId].instructorUserId!==activeUserId)){currentId=rows[0].id;state.currentId=currentId}}
-function save(){state.activeUserId=activeUserId;localStorage.setItem('ada_complete_master_demo',JSON.stringify(state));localStorage.setItem('ada_active_user_id',activeUserId||'');if(!isCloudLoading)queueCloudSave();renderAll()}
+function save(){state.activeUserId=activeUserId;localStorage.setItem('ada_complete_master_demo',JSON.stringify(state));localStorage.setItem('ada_active_user_id',activeUserId||'');if(!isCloudLoading){queueCloudSave();queueSharedLearnerSave()}renderAll()}
 function L(){ensureCurrentLearner();return state.learners[currentId]||visibleLearners()[0]||Object.values(state.learners)[0]}
 function showPage(id,btn){if(!isInstructor()&&id!=='learnerView')id='learnerView';document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));(btn&&btn.dataset.role===currentRole()?btn:document.querySelector(`.tab[data-role="${currentRole()}"]`))?.classList.add('active');renderAll()}
 document.querySelectorAll('[data-field]').forEach(el=>el.addEventListener('input',()=>{L()[el.dataset.field]=el.value;save()}));
@@ -541,6 +638,7 @@ function queueCloudSave(){
 async function syncNow(){
   localStorage.setItem('ada_complete_master_demo',JSON.stringify(state));
   if(!supabaseClient||!supabaseSession){setSyncStatus('Saved locally in this browser.');return}
+  await saveSharedLearnerRecords();
   await saveCloudState();
 }
 async function saveCloudState(){
@@ -557,6 +655,7 @@ async function loadCloudState(){
   if(data&&data.data){
     state=data.data;
     migrateState();
+    await loadSharedLearnerRecords();
     activeUserId=resolveSignedInUserId();
     if(!validUserId(activeUserId))activeUserId='';
     currentId=state.currentId;
@@ -565,8 +664,15 @@ async function loadCloudState(){
     renderAll();
     setSyncStatus(activeUserId?'Loaded cloud data from Supabase.':'Signed in, but no learner or instructor profile matched this email.');
   }else{
+    migrateState();
+    await loadSharedLearnerRecords();
     activeUserId=resolveSignedInUserId();
     if(!validUserId(activeUserId))activeUserId='';
+    currentId=state.currentId;
+    localStorage.setItem('ada_complete_master_demo',JSON.stringify(state));
+    localStorage.setItem('ada_active_user_id',activeUserId||'');
+    renderAll();
+    setSyncStatus(activeUserId?'Loaded shared learner records from Supabase.':'Signed in, but no learner or instructor profile matched this email.');
     await saveCloudState();
   }
   isCloudLoading=false;
